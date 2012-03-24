@@ -1,0 +1,5 @@
+{
+	title = "CaptainHammer";
+	description = "Debug with CaptainHammer";
+	"compatible-modes" = ("application");
+}

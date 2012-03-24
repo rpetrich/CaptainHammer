@@ -1,0 +1,11 @@
+Package: com.rpetrich.captainhammer
+Name: CaptainHammer
+Depends: firmware (>= 3.0), mobilesubstrate, libactivator (>= 1.6.1)
+Version: 0.1
+Architecture: iphoneos-arm
+Description: Simple debugging tools
+Maintainer: thebigboss.org <http://thebigboss.org>
+Author: Ryan Petrich <rpetrich+captainhammer@gmail.com>
+Section: Developer
+Tag: purpose::extension, role::developer
+dev: rpetrich
