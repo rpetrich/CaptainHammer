@@ -3,6 +3,8 @@
 #import <notify.h>
 #import <libactivator/libactivator.h>
 
+#import "SafariRemoteDebugging.h"
+
 %config(generator=internal);
 
 static BOOL isActive;
@@ -86,7 +88,7 @@ static CaptainHammer *sharedVillian;
 - (void)showSheet
 {
 	actionSheet.cancelButtonIndex = [actionSheet addButtonWithTitle:@"Cancel"];
-	UIWindow *window = [[UIApplication sharedApplication] keyWindow];
+	UIWindow *window = [[UIApplication sharedApplication] keyWindow] ?: [[UIApplication sharedApplication].windows objectAtIndex:0];
 	UIView *view = window.rootViewController.view ?: [window.subviews objectAtIndex:0];
 	[actionSheet showInView:view];
 }
@@ -130,6 +132,7 @@ static CaptainHammer *sharedVillian;
 		[actionSheet addButtonWithTitle:@"Unique Identifier"];
 		[actionSheet addButtonWithTitle:@"View Heirarchy"];
 		[actionSheet addButtonWithTitle:@"Web Views"];
+		[actionSheet addButtonWithTitle:@"Web Inspector"];
 		[self showSheet];
 	}
 }
@@ -157,7 +160,7 @@ static CaptainHammer *sharedVillian;
 {
 	switch (buttonIndex) {
 		case 0:
-			objc_msgSend(self, @selector(forceCrash));
+			[self performSelector:@selector(forceCrash) withObject:nil afterDelay:0.0];
 			break;
 		case 1:
 			[self showAndCopyMessage:[UIDevice currentDevice].uniqueIdentifier withTitle:@"Unique Identifier"];
@@ -178,6 +181,13 @@ static CaptainHammer *sharedVillian;
 				[descriptions addObject:[NSString stringWithFormat:@"%@\n%@", webView, [webView stringByEvaluatingJavaScriptFromString:@"document.documentElement.outerHTML"]]];
 			}
 			[self showAndCopyMessage:[descriptions componentsJoinedByString:@"\n\n"] withTitle:@"Web Views"];
+			break;
+		}
+		case 4: {
+			if (SafariRemoteDebuggingEnable())
+				[self showAndCopyMessage:SafariRemoteDebuggingGetAddress() withTitle:@"Safari Remote Inspector"];
+			else
+				[self showAndCopyMessage:@"Unable to setup remote inspector" withTitle:@"Safari Remote Inspector"];
 			break;
 		}
 	}

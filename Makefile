@@ -1,5 +1,5 @@
 TWEAK_NAME = CaptainHammer
-CaptainHammer_FILES = CaptainHammer.x
+CaptainHammer_FILES = CaptainHammer.x SafariRemoteDebugging.m
 CaptainHammer_FRAMEWORKS = UIKit
 CaptainHammer_LDFLAGS = -lactivator
 
