@@ -163,9 +163,15 @@ static CaptainHammer *sharedVillian;
 		case 0:
 			[self performSelector:@selector(forceCrash) withObject:nil afterDelay:0.0];
 			break;
-		case 1:
-			[self showAndCopyMessage:[UIDevice currentDevice].uniqueIdentifier withTitle:@"Unique Identifier"];
+		case 1: {
+			Class class = objc_getClass("MedialetsAnalyticsManager");
+			NSString *string = [UIDevice currentDevice].uniqueIdentifier;
+			if (class && [class respondsToSelector:@selector(md5DeviceID)]) {
+				string = [string stringByAppendingFormat:@"\n%@", objc_msgSend(class, @selector(md5DeviceID))];
+			}
+			[self showAndCopyMessage:string withTitle:@"Unique Identifier"];
 			break;
+		}
 		case 2: {
 			NSMutableArray *descriptions = [NSMutableArray array];
 			for (UIWindow *window in [UIApplication sharedApplication].windows) {
