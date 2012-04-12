@@ -1,6 +1,6 @@
 Package: com.rpetrich.captainhammer
 Name: CaptainHammer
-Depends: firmware (>= 3.0), mobilesubstrate, libactivator (>= 1.6.1)
+Depends: firmware (>= 3.0), mobilesubstrate, libactivator (>= 1.6.2)
 Version: 0.1
 Architecture: iphoneos-arm
 Description: Simple debugging tools
