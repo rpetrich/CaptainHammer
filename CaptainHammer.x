@@ -133,6 +133,7 @@ static CaptainHammer *sharedVillian;
 		[actionSheet addButtonWithTitle:@"View Heirarchy"];
 		[actionSheet addButtonWithTitle:@"Web Views"];
 		[actionSheet addButtonWithTitle:@"Web Inspector"];
+		[actionSheet addButtonWithTitle:@"Clear Pasteboard"];
 		[self showSheet];
 	}
 }
@@ -189,6 +190,14 @@ static CaptainHammer *sharedVillian;
 			else
 				[self showAndCopyMessage:@"Unable to setup remote inspector" withTitle:@"Safari Remote Inspector"];
 			break;
+		}
+		case 5: {
+			[self showAndCopyMessage:nil withTitle:@"Cleared Pasteboards"];
+			[UIPasteboard generalPasteboard].items = nil;
+			[UIPasteboard removePasteboardWithName:@"medialets-analytics"];
+			NSString *libraryPath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+			NSString *path = [[libraryPath stringByAppendingPathComponent:@"Medialets"] stringByAppendingPathComponent:@"analytics.plist"];
+			[[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
 		}
 	}
 }
