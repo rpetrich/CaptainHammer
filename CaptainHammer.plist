@@ -1,1 +1,5 @@
-Filter = {Bundles = ("com.apple.UIKit");};
+Filter = {
+	Bundles = ("com.apple.UIKit");
+	Executables = (webinspectord);
+	Mode = Any;
+};

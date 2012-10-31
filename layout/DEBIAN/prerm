@@ -1,0 +1,6 @@
+#!/bin/bash
+if [ -f /System/Library/LaunchDaemons/com.apple.webinspectord.plist ];
+then
+	launchctl unload /System/Library/LaunchDaemons/com.apple.webinspectord.plist
+	launchctl load /System/Library/LaunchDaemons/com.apple.webinspectord.plist
+fi

@@ -191,7 +191,9 @@ static CaptainHammer *sharedVillian;
 			break;
 		}
 		case 4: {
-			if (SafariRemoteDebuggingEnable())
+			if (kCFCoreFoundationVersionNumber >= 700.0)
+				[self showAndCopyMessage:@"CaptainHammer enables debugging for all applications when Settings > Safari > Advanced > Web Inspector is enabled." withTitle:@"Safari Remote Inspector"];
+			else if (SafariRemoteDebuggingEnable())
 				[self showAndCopyMessage:SafariRemoteDebuggingGetAddress() withTitle:@"Safari Remote Inspector"];
 			else
 				[self showAndCopyMessage:@"Unable to setup remote inspector" withTitle:@"Safari Remote Inspector"];
@@ -233,3 +235,16 @@ static CaptainHammer *sharedVillian;
 }
 
 @end
+
+typedef struct {
+	unsigned _field1[8];
+} WebInspectorEntitlement;
+
+%hook WebInspectorRelay
+
+- (BOOL)_hasRemoteInspectorEntitlement:(WebInspectorEntitlement)entitlement
+{
+	return YES;
+}
+
+%end
