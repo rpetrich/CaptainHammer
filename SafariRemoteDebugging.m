@@ -12,6 +12,7 @@
 #include <ifaddrs.h>
 #include <arpa/inet.h>
 #include <dlfcn.h>
+#include <objc/runtime.h>
 
 @interface WebInspectorServerConnectionHTTP : NSObject
 - (id)initWithSocketFileDescriptor:(int)fd;
@@ -20,6 +21,7 @@
 extern CFRunLoopRef WebThreadRunLoop(void);
 
 static Class connectionClass;
+static NSMutableArray *sockets;
 
 static void accept_callback(CFSocketRef s, CFSocketCallBackType callbackType, CFDataRef address, const void *data, void *info)
 {
@@ -27,7 +29,7 @@ static void accept_callback(CFSocketRef s, CFSocketCallBackType callbackType, CF
         return;
     CFSocketNativeHandle fd = *(CFSocketNativeHandle*)data;
     // Seems to require leaking? that can't be right, but it crashes if I don't
-    [[connectionClass alloc] initWithSocketFileDescriptor:fd];
+    [sockets addObject:[[connectionClass alloc] initWithSocketFileDescriptor:fd]];
 }
 
 static CFRunLoopRef activeRunLoop;
@@ -88,6 +90,8 @@ bool SafariRemoteDebuggingEnable(void)
     CFNotificationCenterAddObserver(center, NULL, EnterForegroundCallback, CFSTR("UIApplicationWillEnterForegroundNotification"), NULL, CFNotificationSuspensionBehaviorCoalesce);
 
     CFRelease(socket);
+
+    sockets = [[NSMutableArray alloc] init];
     return true;
 }
 

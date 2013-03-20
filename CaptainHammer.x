@@ -1,9 +1,12 @@
-#import <UIKit/UIKit2.h>
-#import <SpringBoard/SpringBoard.h>
+#import <UIKit/UIKit.h>
+//#import <SpringBoard/SpringBoard.h>
 #import <notify.h>
 #import <libactivator/libactivator.h>
+#import <objc/message.h>
 
 #import "SafariRemoteDebugging.h"
+
+#import <PonyDebugger/PDDebugger.h>
 
 %config(generator=internal);
 
@@ -43,25 +46,36 @@ static void DidEnterBackgroundNotificationReceived(CFNotificationCenterRef cente
 	}
 }
 
+static void DidFinishLaunchingNotificationReceived(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)
+{
+	PDDebugger *debugger = [PDDebugger defaultInstance];
+	[debugger forwardAllNetworkTraffic];
+}
+
 @implementation CaptainHammer
 
 static CaptainHammer *sharedVillian;
 
 + (void)load
 {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	sharedVillian = [[self alloc] init];
-	if (LASharedActivator.runningInsideSpringBoard) {
-		if (![LASharedActivator hasSeenListenerWithName:@kHammerTime])
-			[LASharedActivator assignEvent:[LAEvent eventWithName:LAEventNameVolumeUpHoldShort mode:LAEventModeApplication] toListenerWithName:@kHammerTime];
-		[LASharedActivator registerListener:sharedVillian forName:@kHammerTime];
-	} else {
+	@autoreleasepool {
+		sharedVillian = [[self alloc] init];
 		CFNotificationCenterRef local = CFNotificationCenterGetLocalCenter();
-		CFNotificationCenterAddObserver(local, WillEnterForegroundNotificationReceived, WillEnterForegroundNotificationReceived, (CFStringRef)UIApplicationDidFinishLaunchingNotification, NULL, CFNotificationSuspensionBehaviorCoalesce);
-		CFNotificationCenterAddObserver(local, WillEnterForegroundNotificationReceived, WillEnterForegroundNotificationReceived, (CFStringRef)UIApplicationWillEnterForegroundNotification, NULL, CFNotificationSuspensionBehaviorCoalesce);
-		CFNotificationCenterAddObserver(local, DidEnterBackgroundNotificationReceived, DidEnterBackgroundNotificationReceived, (CFStringRef)UIApplicationDidEnterBackgroundNotification, NULL, CFNotificationSuspensionBehaviorCoalesce);
+		CFNotificationCenterAddObserver(local, DidFinishLaunchingNotificationReceived, DidFinishLaunchingNotificationReceived, (CFStringRef)UIApplicationDidFinishLaunchingNotification, NULL, CFNotificationSuspensionBehaviorCoalesce);
+		PDDebugger *debugger = [PDDebugger defaultInstance];
+		[debugger autoConnect];
+		[debugger enableViewHierarchyDebugging];
+		[debugger enableNetworkTrafficDebugging];
+		if (LASharedActivator.runningInsideSpringBoard) {
+			if (![LASharedActivator hasSeenListenerWithName:@kHammerTime])
+				[LASharedActivator assignEvent:[LAEvent eventWithName:LAEventNameVolumeUpHoldShort mode:LAEventModeApplication] toListenerWithName:@kHammerTime];
+			[LASharedActivator registerListener:sharedVillian forName:@kHammerTime];
+		} else {
+			CFNotificationCenterAddObserver(local, WillEnterForegroundNotificationReceived, WillEnterForegroundNotificationReceived, (CFStringRef)UIApplicationDidFinishLaunchingNotification, NULL, CFNotificationSuspensionBehaviorCoalesce);
+			CFNotificationCenterAddObserver(local, WillEnterForegroundNotificationReceived, WillEnterForegroundNotificationReceived, (CFStringRef)UIApplicationWillEnterForegroundNotification, NULL, CFNotificationSuspensionBehaviorCoalesce);
+			CFNotificationCenterAddObserver(local, DidEnterBackgroundNotificationReceived, DidEnterBackgroundNotificationReceived, (CFStringRef)UIApplicationDidEnterBackgroundNotification, NULL, CFNotificationSuspensionBehaviorCoalesce);
+		}
 	}
-	[pool drain];
 }
 
 + (CaptainHammer *)sharedVillian
@@ -73,14 +87,12 @@ static CaptainHammer *sharedVillian;
 {
 	[alertView dismissWithClickedButtonIndex:-1 animated:YES];
 	alertView.delegate = nil;
-	[alertView release];
 	alertView = nil;
 	[actionSheet dismissWithClickedButtonIndex:-1 animated:YES];
 	actionSheet.delegate = nil;
-	[actionSheet release];
 	actionSheet = [[UIActionSheet alloc] init];
 	actionSheet.delegate = self;
-	actionSheet.alertSheetStyle = UIActionSheetStyleBlackTranslucent;
+	actionSheet.actionSheetStyle = UIActionSheetStyleBlackTranslucent;
 	actionSheet.title = title;
 	handler = newHandler;
 }
@@ -97,11 +109,9 @@ static CaptainHammer *sharedVillian;
 {
 	[actionSheet dismissWithClickedButtonIndex:-1 animated:YES];
 	actionSheet.delegate = nil;
-	[actionSheet release];
 	actionSheet = nil;
 	[alertView dismissWithClickedButtonIndex:-1 animated:YES];
 	alertView.delegate = nil;
-	[alertView release];
 	alertView = nil;
 	alertView = [[UIAlertView alloc] init];
 	alertView.delegate = self;
@@ -120,11 +130,9 @@ static CaptainHammer *sharedVillian;
 	if (actionSheet || alertView) {
 		[actionSheet dismissWithClickedButtonIndex:-1 animated:YES];
 		actionSheet.delegate = nil;
-		[actionSheet release];
 		actionSheet = nil;
 		[alertView dismissWithClickedButtonIndex:-1 animated:YES];
 		alertView.delegate = nil;
-		[alertView release];
 		alertView = nil;
 	} else {
 		[self newSheetWithTitle:@"CaptainHammer" handler:@selector(defaultSheetClicked:)];
@@ -175,7 +183,7 @@ static CaptainHammer *sharedVillian;
 		case 2: {
 			NSMutableArray *descriptions = [NSMutableArray array];
 			for (UIWindow *window in [UIApplication sharedApplication].windows) {
-				[descriptions addObject:[window recursiveDescription]];
+				[descriptions addObject:objc_msgSend(window, @selector(recursiveDescription))];
 			}
 			[self showAndCopyMessage:[descriptions componentsJoinedByString:@"\n\n"] withTitle:@"View Heirarchy"];
 			break;
@@ -213,7 +221,6 @@ static CaptainHammer *sharedVillian;
 - (void)actionSheet:(UIActionSheet *)actionSheet_ didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
 	actionSheet.delegate = nil;
-	[actionSheet release];
 	actionSheet = nil;
 	if (handler)
 		objc_msgSend(self, handler, buttonIndex);
@@ -222,7 +229,6 @@ static CaptainHammer *sharedVillian;
 - (void)alertView:(UIAlertView *)alertView_ didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
 	alertView.delegate = nil;
-	[alertView release];
 	alertView = nil;
 	if (handler)
 		objc_msgSend(self, handler, buttonIndex);

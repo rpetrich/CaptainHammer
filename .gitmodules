@@ -1,3 +1,6 @@
 [submodule "framework"]
 	path = framework
 	url = git://github.com/rpetrich/theos.git
+[submodule "PonyDebugger"]
+	path = PonyDebugger
+	url = git@github.com:rpetrich/PonyDebugger.git
