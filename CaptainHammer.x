@@ -48,8 +48,9 @@ static void DidEnterBackgroundNotificationReceived(CFNotificationCenterRef cente
 
 static void DidFinishLaunchingNotificationReceived(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)
 {
-	/*PDDebugger *debugger = [PDDebugger defaultInstance];
-	[debugger forwardAllNetworkTraffic];*/
+	PDDebugger *debugger = [PDDebugger defaultInstance];
+	[debugger forwardAllNetworkTraffic];
+	[debugger enableCoreDataDebugging];
 }
 
 @implementation CaptainHammer
