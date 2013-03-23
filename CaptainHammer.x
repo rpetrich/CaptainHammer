@@ -51,6 +51,8 @@ static void DidFinishLaunchingNotificationReceived(CFNotificationCenterRef cente
 	PDDebugger *debugger = [PDDebugger defaultInstance];
 	[debugger forwardAllNetworkTraffic];
 	[debugger enableCoreDataDebugging];
+	[debugger autoConnect];
+	[debugger enableViewHierarchyDebugging];
 }
 
 @implementation CaptainHammer
@@ -64,8 +66,6 @@ static CaptainHammer *sharedVillian;
 		CFNotificationCenterRef local = CFNotificationCenterGetLocalCenter();
 		CFNotificationCenterAddObserver(local, DidFinishLaunchingNotificationReceived, DidFinishLaunchingNotificationReceived, (CFStringRef)UIApplicationDidFinishLaunchingNotification, NULL, CFNotificationSuspensionBehaviorCoalesce);
 		PDDebugger *debugger = [PDDebugger defaultInstance];
-		[debugger autoConnect];
-		[debugger enableViewHierarchyDebugging];
 		[debugger enableNetworkTrafficDebugging];
 		if (LASharedActivator.runningInsideSpringBoard) {
 			if (![LASharedActivator hasSeenListenerWithName:@kHammerTime])
