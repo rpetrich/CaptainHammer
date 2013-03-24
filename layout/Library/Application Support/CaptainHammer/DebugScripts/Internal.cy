@@ -3,8 +3,8 @@
 		throw "Not Printable!";
 	}
 	// Only pretty print JavaScript properties that are backed by Objective-C properties or are whitelisted on bridged Objective-C objects
-	var whitelistedProperties = ["class", "frame"];
-	var whitelistedClassProperties = ["superclass", "messages"];
+	var whitelistedProperties = ["class", "frame", "bounds", "center", "transform", "alpha", "backgroundColor", "contentStretch", "autoresizingMask", "contentMode", "contentStretch", "hidden", "alpha", "opaque", "clipsToBounds", "clearsContextBeforeDrawing", "multipleTouchEnabled", "exclusiveTouch", "superview", "subviews", "window", "autoresizesSubviews", "translatesAutoresizingMaskIntoConstraints", "constraints", "intrinsicContentSize", "alignmentRectInsets", "viewForBaselineLayout", "hasAmbiguousLayout", "contentScaleFactor", "gestureRecognizers", "tag", "restorationIdentifier"];
+	var whitelistedClassProperties = ["superclass", "pointer", "metaMethods", "methods", "properties", "protocols", "layerClass", "requiresConstraintBasedLayout", "areAnimationsEnabled"];
 	Instance.prototype.__prettyPrintableOfProperty = function(prop) {
 		var propName = prop.match(/^is[A-Z]/) ? prop.substring(2, 3).toLowerCase() + prop.substring(3) : prop;
 		var thisClass = object_getClass(this);
@@ -48,8 +48,8 @@
 		return this[prop];
 	}
 	// Make structs loggable, if possible
-	var struct = [new UIView init].frame;
-	Object.getPrototypeOf(struct).__prettyPrintable = function() {
+	var tempStruct = [new UIView init].frame;
+	Object.getPrototypeOf(tempStruct).__prettyPrintable = function() {
 		try {
 			return JSON.stringify(this);
 		} catch (e) {
@@ -57,7 +57,7 @@
 		}
 	}
 	// Hide extra functions tagged onto structs
-	Object.getPrototypeOf(struct).__prettyPrintableOfProperty = function(prop) {
+	Object.getPrototypeOf(tempStruct).__prettyPrintableOfProperty = function(prop) {
 		if (prop == "__prettyPrintable" || prop == "__prettyPrintableOfProperty") {
 			notPrintable();
 		}
