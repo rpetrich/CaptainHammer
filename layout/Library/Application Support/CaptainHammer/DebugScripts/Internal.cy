@@ -10,6 +10,9 @@
 		var thisClass = object_getClass(this);
 		if (class_isMetaClass(thisClass)) {
 			if (whitelistedClassProperties.indexOf(propName) != -1) {
+				if (propName == "superclass" && class_getName(this) == "NSObject") {
+					return null;
+				}
 				return this[prop];
 			}
 		} else {
