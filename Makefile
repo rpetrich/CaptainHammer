@@ -6,6 +6,7 @@ CaptainHammer_LIBRARIES = activator icucore cycript apr-1
 
 ADDITIONAL_CFLAGS = -std=c99 -IHeaders -IPonyDebugger/ObjC -IHeaders/PonyDebugger -fobjc-arc -Os
 SDKVERSION = 5.1
+ARCHS = armv7
 INCLUDE_SDKVERSION = 6.1
 TARGET_IPHONEOS_DEPLOYMENT_VERSION = 3.0
 TARGET_CC = xcrun -sdk iphoneos clang
