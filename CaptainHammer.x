@@ -7,6 +7,7 @@
 #import "SafariRemoteDebugging.h"
 
 #import <PonyDebugger/PDDebugger.h>
+#import <PonyDebugger/PDRuntimeDomainController.h>
 
 %config(generator=internal);
 
@@ -49,7 +50,6 @@ static void DidEnterBackgroundNotificationReceived(CFNotificationCenterRef cente
 static void DidFinishLaunchingNotificationReceived(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo)
 {
 	PDDebugger *debugger = [PDDebugger defaultInstance];
-	[debugger forwardAllNetworkTraffic];
 	[debugger enableCoreDataDebugging];
 	[debugger autoConnect];
 	[debugger enableViewHierarchyDebugging];
@@ -67,6 +67,9 @@ static CaptainHammer *sharedVillian;
 		CFNotificationCenterAddObserver(local, DidFinishLaunchingNotificationReceived, DidFinishLaunchingNotificationReceived, (CFStringRef)UIApplicationDidFinishLaunchingNotification, NULL, CFNotificationSuspensionBehaviorCoalesce);
 		PDDebugger *debugger = [PDDebugger defaultInstance];
 		[debugger enableNetworkTrafficDebugging];
+		[debugger forwardAllNetworkTraffic];
+		[debugger enableRemoteLogging];
+		[PDRuntimeDomainController defaultInstance].debugScriptPath = @"/Library/Application Support/CaptainHammer/DebugScripts";
 		if (LASharedActivator.runningInsideSpringBoard) {
 			if (![LASharedActivator hasSeenListenerWithName:@kHammerTime])
 				[LASharedActivator assignEvent:[LAEvent eventWithName:LAEventNameVolumeUpHoldShort mode:LAEventModeApplication] toListenerWithName:@kHammerTime];
