@@ -1,7 +1,7 @@
 Package: com.rpetrich.captainhammer
 Name: CaptainHammer
 Depends: firmware (>= 3), mobilesubstrate, libactivator (>= 1.7), cycript
-Version: 0.5.3
+Version: 0.5.4
 Architecture: iphoneos-arm
 Description: Simple debugging tools to enable the remote WebKit inspector and provide integration with PonyDebugger
 Maintainer: thebigboss.org <http://thebigboss.org>
