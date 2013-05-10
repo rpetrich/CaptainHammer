@@ -65,11 +65,15 @@ static CaptainHammer *sharedVillian;
 		sharedVillian = [[self alloc] init];
 		CFNotificationCenterRef local = CFNotificationCenterGetLocalCenter();
 		CFNotificationCenterAddObserver(local, DidFinishLaunchingNotificationReceived, DidFinishLaunchingNotificationReceived, (CFStringRef)UIApplicationDidFinishLaunchingNotification, NULL, CFNotificationSuspensionBehaviorCoalesce);
-		PDDebugger *debugger = [PDDebugger defaultInstance];
-		[debugger enableNetworkTrafficDebugging];
-		[debugger forwardAllNetworkTraffic];
-		[debugger enableRemoteLogging];
-		[PDRuntimeDomainController defaultInstance].debugScriptPath = @"/Library/Application Support/CaptainHammer/DebugScripts";
+		NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.rpetrich.captainhammer.plist"];
+		id setting = [settings objectForKey:[NSString stringWithFormat:@"PonyDebuggerEnabled-%@", [NSBundle mainBundle].bundleIdentifier]];
+		if (!setting || [setting boolValue]) {
+			PDDebugger *debugger = [PDDebugger defaultInstance];
+			[debugger enableNetworkTrafficDebugging];
+			[debugger forwardAllNetworkTraffic];
+			[debugger enableRemoteLogging];
+			[PDRuntimeDomainController defaultInstance].debugScriptPath = @"/Library/Application Support/CaptainHammer/DebugScripts";
+		}
 		if (LASharedActivator.runningInsideSpringBoard) {
 			if (![LASharedActivator hasSeenListenerWithName:@kHammerTime])
 				[LASharedActivator assignEvent:[LAEvent eventWithName:LAEventNameVolumeUpHoldShort mode:LAEventModeApplication] toListenerWithName:@kHammerTime];
