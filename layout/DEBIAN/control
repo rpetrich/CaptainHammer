@@ -6,6 +6,6 @@ Architecture: iphoneos-arm
 Description: Simple debugging tools to enable the remote WebKit inspector and provide integration with PonyDebugger
 Maintainer: thebigboss.org <http://thebigboss.org>
 Author: Ryan Petrich <rpetrich+captainhammer@gmail.com>
-Section: Developer
+Section: Development
 Tag: purpose::extension, role::developer
 dev: rpetrich
